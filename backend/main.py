@@ -8,12 +8,15 @@ from ws import manager
 
 app = FastAPI(title="Restaurant QR Order")
 
+cors_origins = os.getenv("CORS_ORIGINS", "*")
+allow_origins = [origin.strip() for origin in cors_origins.split(",")] if cors_origins else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 
