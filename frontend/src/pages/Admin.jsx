@@ -422,32 +422,83 @@ export default function Admin() {
           </section>
 
           <section className="grid gap-6 lg:grid-cols-3">
-            <div className="rounded-3xl glass p-6 shadow-lg">
-              <h2 className="text-lg font-semibold text-slate-800">Top Items</h2>
-              <ul className="mt-4 space-y-2 text-sm text-slate-600">
+            <div className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 p-6 shadow-[0_20px_50px_-30px_rgba(15,23,42,0.45)]">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-teal-200/50 blur-2xl" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-teal-500">Leaders</p>
+                  <h2 className="mt-2 text-lg font-semibold text-slate-800">Top Items</h2>
+                </div>
+                <div className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+                  {topItems.length}
+                </div>
+              </div>
+              <ul className="mt-4 space-y-3 text-sm text-slate-700">
                 {topItems.map((item) => (
-                  <li key={item.id} className="rounded-xl bg-slate-50 px-3 py-2">
-                    {item.name} · {item.orders} orders · {formatCurrency(item.revenue)}
+                  <li
+                    key={item.id}
+                    className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white/90 px-4 py-3"
+                  >
+                    <div>
+                      <p className="font-semibold text-slate-800">{item.name}</p>
+                      <p className="text-xs text-slate-500">{item.orders} orders</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      {formatCurrency(item.revenue)}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-3xl glass p-6 shadow-lg">
-              <h2 className="text-lg font-semibold text-slate-800">Sales by Category</h2>
-              <ul className="mt-4 space-y-2 text-sm text-slate-600">
+            <div className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 p-6 shadow-[0_20px_50px_-30px_rgba(15,23,42,0.45)]">
+              <div className="pointer-events-none absolute -left-10 -top-10 h-24 w-24 rounded-full bg-sky-200/50 blur-2xl" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-sky-500">Categories</p>
+                  <h2 className="mt-2 text-lg font-semibold text-slate-800">Sales by Category</h2>
+                </div>
+                <div className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+                  {categorySales.length}
+                </div>
+              </div>
+              <ul className="mt-4 space-y-3 text-sm text-slate-700">
                 {categorySales.map((cat) => (
-                  <li key={cat.category} className="rounded-xl bg-slate-50 px-3 py-2">
-                    {cat.category} · {formatCurrency(cat.revenue)}
+                  <li
+                    key={cat.category}
+                    className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white/90 px-4 py-3"
+                  >
+                    <span className="font-semibold text-slate-800">{cat.category}</span>
+                    <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+                      {formatCurrency(cat.revenue)}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-3xl glass p-6 shadow-lg">
-              <h2 className="text-lg font-semibold text-slate-800">Orders by Hour</h2>
-              <ul className="mt-4 space-y-2 text-sm text-slate-600">
+            <div className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 p-6 shadow-[0_20px_50px_-30px_rgba(15,23,42,0.45)]">
+              <div className="pointer-events-none absolute -right-10 -bottom-10 h-24 w-24 rounded-full bg-indigo-200/50 blur-2xl" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">Momentum</p>
+                  <h2 className="mt-2 text-lg font-semibold text-slate-800">Orders by Hour</h2>
+                </div>
+                <div className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                  {hourly.length}
+                </div>
+              </div>
+              <ul className="mt-4 space-y-3 text-sm text-slate-700">
                 {hourly.map((slot) => (
-                  <li key={slot.hour} className="rounded-xl bg-slate-50 px-3 py-2">
-                    {slot.hour}:00 · {slot.orders} orders
+                  <li
+                    key={slot.hour}
+                    className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white/90 px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-indigo-400" />
+                      <p className="font-semibold text-slate-800">{slot.hour}:00</p>
+                    </div>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                      {slot.orders} orders
+                    </span>
                   </li>
                 ))}
               </ul>
