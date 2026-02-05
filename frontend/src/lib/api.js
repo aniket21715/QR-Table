@@ -1,20 +1,35 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
 let memoryToken = null;
 
+
+function normalizeToken(value) {
+  if (!value) return null;
+  const token = String(value).trim().replace(/^"|"$/g, "");
+  if (!token || token === "null" || token === "undefined") return null;
+  if (!token.includes(".")) return null;
+  return token;
+}
+
 export function getAuthToken() {
   if (memoryToken) return memoryToken;
   try {
-    return localStorage.getItem("admin_token");
+    const stored = localStorage.getItem("admin_token");
+    const normalized = normalizeToken(stored);
+    if (!normalized && stored) {
+      localStorage.removeItem("admin_token");
+    }
+    return normalized;
   } catch {
     return null;
   }
 }
 
 export function setAuthToken(token) {
-  memoryToken = token;
+  const normalized = normalizeToken(token);
+  memoryToken = normalized;
   try {
-    if (token) {
-      localStorage.setItem("admin_token", token);
+    if (normalized) {
+      localStorage.setItem("admin_token", normalized);
     } else {
       localStorage.removeItem("admin_token");
     }
@@ -35,8 +50,17 @@ async function apiFetch(path, options = {}) {
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || response.statusText);
+    if (response.status === 401) {
+      setAuthToken(null);
+    }
+    let message = "";
+    try {
+      const data = await response.json();
+      message = data?.detail || JSON.stringify(data);
+    } catch {
+      message = await response.text();
+    }
+    throw new Error(message || response.statusText);
   }
 
   if (response.status === 204) {

@@ -92,7 +92,14 @@ export default function Admin() {
 
       const firstError = results.find((res) => res.status === "rejected");
       if (firstError) {
-        setError(firstError.reason?.message || "Failed to load admin data");
+        const message = firstError.reason?.message || "Failed to load admin data";
+        if (message.includes("Invalid token") || message.includes("Missing token")) {
+          setAuthToken(null);
+          setIsAuthed(false);
+          setError("Session expired. Please log in again.");
+          return;
+        }
+        setError(message);
       } else {
         setError("");
       }

@@ -38,6 +38,9 @@ def get_current_user(
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing token")
     token = authorization.split(" ", 1)[1]
+    token = token.strip().strip("\"")
+    if token in {"", "null", "undefined"}:
+        raise HTTPException(status_code=401, detail="Missing token")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
@@ -56,6 +59,9 @@ def get_optional_user(
     if not authorization or not authorization.startswith("Bearer "):
         return None
     token = authorization.split(" ", 1)[1]
+    token = token.strip().strip("\"")
+    if token in {"", "null", "undefined"}:
+        return None
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
