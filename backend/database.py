@@ -7,7 +7,19 @@ DATABASE_URL = os.getenv(
     "postgresql+psycopg2://postgres:postgres@db:5432/restaurant"
 )
 
-engine = create_engine(DATABASE_URL, future=True)
+connect_args = {}
+if DATABASE_URL.startswith("postgresql") and "sslmode=" not in DATABASE_URL:
+    if "localhost" not in DATABASE_URL and "@db:" not in DATABASE_URL:
+        connect_args["sslmode"] = "require"
+
+engine = create_engine(
+    DATABASE_URL,
+    future=True,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    pool_timeout=30,
+    connect_args=connect_args,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
