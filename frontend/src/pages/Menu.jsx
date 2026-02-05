@@ -20,6 +20,7 @@ export default function Menu() {
   const [diet, setDiet] = useState("all");
   const [search, setSearch] = useState("");
   const [trendingIds, setTrendingIds] = useState(new Set());
+  const [availableTables, setAvailableTables] = useState([]);
   const [tableCode, setTableCode] = useState("");
   const [tableLookupError, setTableLookupError] = useState("");
   const [tableLookupLoading, setTableLookupLoading] = useState(false);
@@ -63,6 +64,23 @@ export default function Menu() {
       isMounted = false;
     };
   }, [queryString]);
+
+
+  useEffect(() => {
+    if (restaurantId) return;
+    let isMounted = true;
+    tablesApi
+      .publicList()
+      .then((data) => {
+        if (isMounted) setAvailableTables(data);
+      })
+      .catch(() => {
+        if (isMounted) setAvailableTables([]);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [restaurantId]);
 
   useEffect(() => {
     if (!restaurantId) {
@@ -146,25 +164,56 @@ export default function Menu() {
         <section className="rounded-3xl glass p-6 shadow-lg">
           <h2 className="text-lg font-semibold text-slate-800">Join your table</h2>
           <p className="mt-1 text-sm text-slate-600">
-            If you did not scan a QR, enter the table code printed on your table.
+            Pick your table from the list or type the table code printed on your table.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <input
-              className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              placeholder="Enter table code"
-              value={tableCode}
-              onChange={(event) => setTableCode(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") handleTableLookup();
-              }}
-            />
-            <button
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-              onClick={handleTableLookup}
-              disabled={tableLookupLoading}
-            >
-              {tableLookupLoading ? "Checking..." : "Open Menu"}
-            </button>
+          <div className="mt-4 grid gap-3 md:grid-cols-[1.2fr_1fr]">
+            <div>
+              <label className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                Available tables
+              </label>
+              <select
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+                defaultValue=""
+                onChange={(event) => {
+                  const selectedId = Number(event.target.value);
+                  const table = availableTables.find((item) => item.id === selectedId);
+                  if (!table) return;
+                  window.location.href = tablesApi.menuUrl(table);
+                }}
+              >
+                <option value="" disabled>
+                  Select a table
+                </option>
+                {availableTables.map((table) => (
+                  <option key={table.id} value={table.id}>
+                    {table.label} ({table.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                Table code
+              </label>
+              <div className="mt-2 flex flex-wrap gap-3">
+                <input
+                  className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="Enter table code"
+                  value={tableCode}
+                  onChange={(event) => setTableCode(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") handleTableLookup();
+                  }}
+                />
+                <button
+                  className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                  onClick={handleTableLookup}
+                  disabled={tableLookupLoading}
+                >
+                  {tableLookupLoading ? "Checking..." : "Open Menu"}
+                </button>
+              </div>
+            </div>
           </div>
           {tableLookupError && (
             <p className="mt-3 text-sm text-rose-600">{tableLookupError}</p>

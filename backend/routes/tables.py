@@ -39,6 +39,17 @@ def list_tables(db: Session = Depends(get_db), owner: User = Depends(require_own
     )
 
 
+@router.get("/public", response_model=list[TableOut])
+def list_tables_public(
+    restaurant_id: int | None = None,
+    db: Session = Depends(get_db),
+) -> list[Table]:
+    query = db.query(Table).order_by(Table.id)
+    if restaurant_id:
+        query = query.filter(Table.restaurant_id == restaurant_id)
+    return query.all()
+
+
 @router.get("/lookup", response_model=TableOut)
 def lookup_table(code: str, db: Session = Depends(get_db)) -> Table:
     table = db.query(Table).filter(Table.code == code).first()

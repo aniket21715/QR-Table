@@ -117,7 +117,11 @@ export const tablesApi = {
     const frontendUrl = window.location.origin;
     return `${frontendUrl}/?restaurant=${table.restaurant_id}&table=${table.id}&code=${table.code}`;
   },
-  lookupByCode: (code) => apiFetch(`/tables/lookup?code=${encodeURIComponent(code)}`)
+  lookupByCode: (code) => apiFetch(`/tables/lookup?code=${encodeURIComponent(code)}`),
+  publicList: (restaurantId = null) => {
+    const param = restaurantId ? `?restaurant_id=${restaurantId}` : "";
+    return apiFetch(`/tables/public${param}`);
+  }
 };
 
 export function getWebSocketUrl(path) {
