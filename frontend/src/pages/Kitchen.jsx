@@ -6,6 +6,10 @@ export default function Kitchen() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
   const loadOrders = () => {
+    // Don't fetch if not logged in
+    if (!getAuthToken()) {
+      return;
+    }
     orderApi
       .list()
       .then((data) => {
