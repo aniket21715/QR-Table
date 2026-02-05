@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   analyticsApi,
+  getAuthToken,
   menuApi,
   orderApi,
   recommendationsApi,
+  setAuthToken,
   tablesApi
 } from "../lib/api.js";
 
@@ -48,7 +50,7 @@ export default function Admin() {
     restaurant_name: "",
     city: ""
   });
-  const [isAuthed, setIsAuthed] = useState(() => !!localStorage.getItem("admin_token"));
+  const [isAuthed, setIsAuthed] = useState(() => !!getAuthToken());
   const [section, setSection] = useState("insights");
 
   const loadAll = () => {
@@ -151,7 +153,7 @@ export default function Admin() {
         throw new Error(text || "Login failed");
       }
       const data = await response.json();
-      localStorage.setItem("admin_token", data.token);
+      setAuthToken(data.token);
       setIsAuthed(true);
       setError("");
     } catch (err) {
@@ -160,7 +162,7 @@ export default function Admin() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_token");
+    setAuthToken(null);
     setIsAuthed(false);
   };
 

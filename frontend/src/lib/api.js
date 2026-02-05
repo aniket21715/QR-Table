@@ -1,7 +1,30 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+let memoryToken = null;
+
+export function getAuthToken() {
+  if (memoryToken) return memoryToken;
+  try {
+    return localStorage.getItem("admin_token");
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token) {
+  memoryToken = token;
+  try {
+    if (token) {
+      localStorage.setItem("admin_token", token);
+    } else {
+      localStorage.removeItem("admin_token");
+    }
+  } catch {
+    // Ignore storage errors (private mode or blocked storage).
+  }
+}
 
 async function apiFetch(path, options = {}) {
-  const token = localStorage.getItem("admin_token");
+  const token = getAuthToken();
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       "Content-Type": "application/json",

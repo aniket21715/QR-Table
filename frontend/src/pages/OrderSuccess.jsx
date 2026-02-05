@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { orderApi } from "../lib/api.js";
+import { getAuthToken, orderApi } from "../lib/api.js";
 
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
@@ -9,7 +9,7 @@ export default function OrderSuccess() {
 
   useEffect(() => {
     let isMounted = true;
-    const token = localStorage.getItem("admin_token");
+    const token = getAuthToken();
     if (!orderId || !token) return () => {};
     orderApi
       .get(orderId)

@@ -1,12 +1,10 @@
 ﻿import { useEffect, useState } from "react";
 import OrderCard from "../components/OrderCard.jsx";
-import { getWebSocketUrl, orderApi } from "../lib/api.js";
+import { getAuthToken, getWebSocketUrl, orderApi } from "../lib/api.js";
 
 export default function Kitchen() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
-  const token = localStorage.getItem("admin_token");
-
   const loadOrders = () => {
     orderApi
       .list()
@@ -20,6 +18,7 @@ export default function Kitchen() {
   };
 
   useEffect(() => {
+    const token = getAuthToken();
     if (!token) {
       setError("Login required to view kitchen orders.");
       return () => {};
