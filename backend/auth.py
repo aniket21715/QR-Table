@@ -26,6 +26,8 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
+    if "sub" in to_encode and to_encode["sub"] is not None:
+        to_encode["sub"] = str(to_encode["sub"])
     expire = datetime.utcnow() + (expires_delta or timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -44,6 +46,7 @@ def get_current_user(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
+        user_id = int(user_id) if user_id is not None else None
     except JWTError as exc:
         raise HTTPException(status_code=401, detail="Invalid token") from exc
     user = db.query(User).filter(User.id == user_id).first()
@@ -65,6 +68,7 @@ def get_optional_user(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
+        user_id = int(user_id) if user_id is not None else None
     except JWTError:
         return None
     return db.query(User).filter(User.id == user_id).first()
