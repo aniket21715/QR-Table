@@ -111,7 +111,13 @@ export const tablesApi = {
   list: () => apiFetch("/tables/"),
   create: (payload) => apiFetch("/tables/", { method: "POST", body: JSON.stringify(payload) }),
   delete: (id) => apiFetch(`/tables/${id}`, { method: "DELETE" }),
-  qrUrl: (id) => `${API_BASE}/tables/${id}/qr`
+  qrUrl: (id) => `${API_BASE}/tables/${id}/qr`,
+  // Generate the menu URL that the QR code redirects to
+  menuUrl: (table) => {
+    const frontendUrl = window.location.origin;
+    return `${frontendUrl}/?restaurant=${table.restaurant_id}&table=${table.id}&code=${table.code}`;
+  },
+  lookupByCode: (code) => apiFetch(`/tables/lookup?code=${encodeURIComponent(code)}`)
 };
 
 export function getWebSocketUrl(path) {

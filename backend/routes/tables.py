@@ -39,6 +39,14 @@ def list_tables(db: Session = Depends(get_db), owner: User = Depends(require_own
     )
 
 
+@router.get("/lookup", response_model=TableOut)
+def lookup_table(code: str, db: Session = Depends(get_db)) -> Table:
+    table = db.query(Table).filter(Table.code == code).first()
+    if not table:
+        raise HTTPException(status_code=404, detail="Table not found")
+    return table
+
+
 @router.post("/", response_model=TableOut, status_code=201)
 def create_table(
     payload: TableCreate, db: Session = Depends(get_db), owner: User = Depends(require_owner)

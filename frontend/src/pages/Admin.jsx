@@ -649,25 +649,45 @@ export default function Admin() {
             </button>
           </div>
           <div className="mt-4 grid gap-4">
-            {tables.map((table) => (
-              <div key={table.id} className="flex items-center gap-4">
-                <img
-                  src={tablesApi.qrUrl(table.id)}
-                  alt={`QR ${table.label}`}
-                  className="h-16 w-16 rounded-xl border border-slate-200 bg-white"
-                />
-                <div className="flex-1">
-                  <p className="font-semibold text-slate-800">{table.label}</p>
-                  <p className="text-xs text-slate-500">Code: {table.code}</p>
-                </div>
-                <button
-                  className="rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-600"
-                  onClick={() => deleteTable(table.id)}
+            {tables.map((table) => {
+              const menuUrl = tablesApi.menuUrl(table);
+              return (
+                <div
+                  key={table.id}
+                  className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-3"
                 >
-                  Remove
-                </button>
-              </div>
-            ))}
+                  <a
+                    href={menuUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={menuUrl}
+                    className="group relative"
+                  >
+                    <img
+                      src={tablesApi.qrUrl(table.id)}
+                      alt={`QR ${table.label}`}
+                      className="h-16 w-16 rounded-xl border border-slate-200 bg-white transition group-hover:scale-105 group-hover:shadow-lg"
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-slate-900/70 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100">
+                      Open
+                    </span>
+                  </a>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-slate-800">{table.label}</p>
+                    <p className="text-xs text-slate-500">Code: {table.code}</p>
+                    <p className="mt-1 truncate text-xs text-teal-600" title={menuUrl}>
+                      {menuUrl}
+                    </p>
+                  </div>
+                  <button
+                    className="rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-600 hover:bg-rose-50"
+                    onClick={() => deleteTable(table.id)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
