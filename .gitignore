@@ -25,3 +25,5 @@ alembic/__pycache__/
 
 # QR assets
 qr-*.png
+
+cloudflared*
