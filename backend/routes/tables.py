@@ -79,13 +79,9 @@ def delete_table(table_id: int, db: Session = Depends(get_db), owner: User = Dep
 
 
 @router.get("/{table_id}/qr")
-def table_qr(table_id: int, db: Session = Depends(get_db), owner: User = Depends(require_owner)) -> Response:
-    table = (
-        db.query(Table)
-        .filter(Table.id == table_id)
-        .filter(Table.restaurant_id == owner.restaurant_id)
-        .first()
-    )
+def table_qr(table_id: int, db: Session = Depends(get_db)) -> Response:
+    """Public endpoint to generate QR code for a table."""
+    table = db.query(Table).filter(Table.id == table_id).first()
     if not table:
         raise HTTPException(status_code=404, detail="Table not found")
 

@@ -21,7 +21,7 @@ export default function Kitchen() {
     const token = getAuthToken();
     if (!token) {
       setError("Login required to view kitchen orders.");
-      return () => {};
+      return () => { };
     }
     loadOrders();
     let pollInterval = null;
@@ -36,22 +36,34 @@ export default function Kitchen() {
       }
     };
 
-    const socket = new WebSocket(getWebSocketUrl("/ws/orders"));
-    socket.onopen = () => {
-      stopPolling();
-      setError("");
-    };
-    socket.onmessage = () => loadOrders();
-    socket.onerror = () => {
-      setError("WebSocket connection failed. Falling back to auto-refresh.");
+    let socket = null;
+    try {
+      socket = new WebSocket(getWebSocketUrl("/ws/orders"));
+      socket.onopen = () => {
+        stopPolling();
+        setError("");
+      };
+      socket.onmessage = () => loadOrders();
+      socket.onerror = () => {
+        // WebSocket failed, use polling instead (this is normal on some hosts)
+        startPolling();
+      };
+      socket.onclose = () => {
+        startPolling();
+      };
+    } catch {
+      // WebSocket not supported or blocked, use polling
       startPolling();
-    };
-    socket.onclose = () => {
-      startPolling();
-    };
+    }
     return () => {
       stopPolling();
-      socket.close();
+      if (socket) {
+        try {
+          socket.close();
+        } catch {
+          // Ignore close errors
+        }
+      }
     };
   }, []);
 
@@ -72,8 +84,8 @@ export default function Kitchen() {
         {orders
           .filter((order) => order.status !== "completed")
           .map((order) => (
-          <OrderCard key={order.id} order={order} onUpdate={loadOrders} />
-        ))}
+            <OrderCard key={order.id} order={order} onUpdate={loadOrders} />
+          ))}
       </div>
     </div>
   );
