@@ -13,7 +13,7 @@ from models import Table, User
 
 router = APIRouter(prefix="/tables", tags=["tables"])
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
 class TableOut(BaseModel):
@@ -110,7 +110,7 @@ def table_qr(table_id: int, db: Session = Depends(get_db)) -> Response:
         raise HTTPException(status_code=500, detail="qrcode not installed") from exc
 
     payload = (
-        f"{FRONTEND_URL}/?restaurant={table.restaurant_id}&table={table.id}&code={table.code}"
+        f"{FRONTEND_URL}/menu?restaurant={table.restaurant_id}&table={table.id}&code={table.code}"
     )
     qr = qrcode.make(payload)
     buffer = BytesIO()

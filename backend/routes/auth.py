@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 
-from auth import create_access_token, get_password_hash, verify_password
+from auth import create_access_token, get_password_hash, require_owner, verify_password
 from database import get_db
 from models import Restaurant, User
 
@@ -25,6 +25,13 @@ class LoginPayload(BaseModel):
 def _enforce_password_limit(password: str) -> None:
     if len(password.encode("utf-8")) > 72:
         raise HTTPException(status_code=400, detail="Password must be 72 bytes or fewer")
+
+
+def _restaurant_name(db: Session, restaurant_id: int | None) -> str | None:
+    if not restaurant_id:
+        return None
+    restaurant = db.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+    return restaurant.name if restaurant else None
 
 
 @router.post("/signup")
@@ -50,7 +57,11 @@ def signup(payload: SignupPayload, db: Session = Depends(get_db)) -> dict:
     db.refresh(user)
 
     token = create_access_token({"sub": user.id, "restaurant_id": user.restaurant_id})
-    return {"token": token, "restaurant_id": user.restaurant_id}
+    return {
+        "token": token,
+        "restaurant_id": user.restaurant_id,
+        "restaurant_name": restaurant.name,
+    }
 
 
 @router.post("/login")
@@ -60,4 +71,18 @@ def login(payload: LoginPayload, db: Session = Depends(get_db)) -> dict:
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token({"sub": user.id, "restaurant_id": user.restaurant_id})
-    return {"token": token, "restaurant_id": user.restaurant_id}
+    return {
+        "token": token,
+        "restaurant_id": user.restaurant_id,
+        "restaurant_name": _restaurant_name(db, user.restaurant_id),
+    }
+
+
+@router.get("/me")
+def me(user: User = Depends(require_owner), db: Session = Depends(get_db)) -> dict:
+    return {
+        "user_id": user.id,
+        "email": user.email,
+        "restaurant_id": user.restaurant_id,
+        "restaurant_name": _restaurant_name(db, user.restaurant_id),
+    }
