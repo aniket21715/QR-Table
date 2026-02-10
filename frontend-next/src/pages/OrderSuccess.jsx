@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { getAuthToken, orderApi } from "../lib/api.js";
 
-export default function OrderSuccess() {
-  const searchParams = useSearchParams();
-  const orderId = searchParams.get("order_id");
+export default function OrderSuccess({ orderId = null }) {
   const [order, setOrder] = useState(null);
 
   useEffect(() => {

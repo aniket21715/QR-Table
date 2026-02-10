@@ -27,15 +27,18 @@ const HERO_IMAGE =
   "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80";
 
 export default function Home() {
-  const [restaurantName, setRestaurantNameState] = useState(
-    getRestaurantName() || FALLBACK_RESTAURANT_NAME
-  );
+  const [restaurantName, setRestaurantNameState] = useState(FALLBACK_RESTAURANT_NAME);
   const [tables, setTables] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let isMounted = true;
     const token = getAuthToken();
+    const storedName = getRestaurantName();
+
+    if (storedName) {
+      setRestaurantNameState(storedName);
+    }
 
     if (token) {
       authApi
